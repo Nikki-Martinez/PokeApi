@@ -1,5 +1,5 @@
 const container = document.querySelector('.container-cards');
-
+const pageSize = parseInt(document.getElementById('page-size').value);
 // Función para traer datos de un Pokémon por su ID
 async function getPokemon(id) {
   try {
@@ -50,4 +50,4 @@ async function loadPokemons(limit = 100) {
   }
 }
 
-loadPokemons(100); 
+loadPokemons(pageSize); 
