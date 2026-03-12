@@ -1,0 +1,67 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  padding: 20px;
+}
+
+/* Contenedor de todas las cards */
+.container-cards {
+  display: flex;          /* organiza las cards en fila */
+  flex-wrap: wrap;        /* permite que bajen a otra fila si no caben */
+  gap: 20px;              /* espacio entre cards */
+  justify-content: flex-start; /* alineación al inicio (izquierda) */
+}
+
+/* Card individual */
+.card {
+  width: 250px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  background-color: #fff;
+  padding: 10px;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover{
+  transform: scale(1.05);
+}
+
+/* ID arriba a la izquierda */
+#pokemon-id {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-weight: bold;
+}
+
+/* Imagen centrada dentro de la card */
+.image-container {
+  text-align: center;
+  margin-top: 30px; /* deja espacio para el ID */
+}
+
+#pokemon-image {
+  width: 120px;
+  height: 120px;
+  user-select: none;
+}
+
+/* Nombre centrado debajo de la imagen */
+#pokemon-name {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Stats abajo alineados a la izquierda */
+.stats {
+  margin-top: 10px;
+}
+
+.stats p {
+  margin: 3px 0;
+}
