@@ -32,7 +32,7 @@ async function getPokemon(id) {
 function createCard(pokemon) {
   const card = document.createElement('div');
   card.classList.add('card');
-
+  const nameCapitalized = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
   card.innerHTML = `
     <p class="pokemon-id">ID: ${pokemon.id}</p>
 
@@ -43,7 +43,7 @@ function createCard(pokemon) {
         title="${pokemon.name}">
     </div>
 
-    <p id="pokemon-name">${pokemon.name}</p>
+    <p id="pokemon-name">${nameCapitalized}</p>
 
     <div class="stats">
       <p class="pokemon-weight">Peso: ${pokemon.weight}hg</p>
