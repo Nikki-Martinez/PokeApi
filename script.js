@@ -1,6 +1,13 @@
 const container = document.querySelector('.container-cards');
 const selectPageSize = document.getElementById('page-size');
 
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const pageNumber = document.getElementById('page-number');
+
+let currentPage = 1;
+let pageSize = parseInt(selectPageSize.value);
+
 // Función para traer datos de un Pokémon por su ID
 async function getPokemon(id) {
   try {
@@ -21,9 +28,8 @@ async function getPokemon(id) {
   }
 }
 
-// Función para crear y renderizar una card
+// Crear card
 function createCard(pokemon) {
-
   const card = document.createElement('div');
   card.classList.add('card');
 
@@ -32,9 +38,9 @@ function createCard(pokemon) {
 
     <div class="image-container">
       <img class="pokemon-image"
-      src="${pokemon.image}"
-      alt="${pokemon.name}"
-      title="${pokemon.name}">
+        src="${pokemon.image}"
+        alt="${pokemon.name}"
+        title="${pokemon.name}">
     </div>
 
     <p id="pokemon-name">${pokemon.name}</p>
@@ -49,36 +55,55 @@ function createCard(pokemon) {
   container.appendChild(card);
 }
 
-
-// Función principal para traer y mostrar varios Pokémon
-async function loadPokemons(limit) {
-
-  for (let i = 1; i <= limit; i++) {
-
-    const pokemon = await getPokemon(i);
-
-    if (pokemon) {
-      createCard(pokemon);
-    }
-
-  }
-
-}
-
-
-// evento cuando cambia el select
-selectPageSize.addEventListener('change', function () {
-
-  const newPageSize = parseInt(this.value);
+// Cargar pokémons con paginación
+async function loadPokemons(page, pageSize) {
 
   container.innerHTML = '';
 
-  loadPokemons(newPageSize);
+  const start = (page - 1) * pageSize + 1;
+  const end = page * pageSize;
+
+  const promises = [];
+
+  for (let i = start; i <= end; i++) {
+    promises.push(getPokemon(i));
+  }
+
+  const pokemons = await Promise.all(promises);
+
+  pokemons.forEach(pokemon => {
+    if (pokemon) createCard(pokemon);
+  });
+
+}
+
+// Botón siguiente
+nextBtn.addEventListener('click', () => {
+  currentPage++;
+  pageNumber.textContent = currentPage;
+  loadPokemons(currentPage, pageSize);
+});
+
+// Botón anterior
+prevBtn.addEventListener('click', () => {
+  if (currentPage > 1) {
+    currentPage--;
+    pageNumber.textContent = currentPage;
+    loadPokemons(currentPage, pageSize);
+  }
+});
+
+// Cambio de cantidad por página
+selectPageSize.addEventListener('change', function () {
+
+  pageSize = parseInt(this.value);
+  currentPage = 1;
+
+  pageNumber.textContent = currentPage;
+
+  loadPokemons(currentPage, pageSize);
 
 });
 
-
-// primera carga de la página
-const initialPageSize = parseInt(selectPageSize.value);
-
-loadPokemons(initialPageSize);
+// Primera carga
+loadPokemons(currentPage, pageSize);

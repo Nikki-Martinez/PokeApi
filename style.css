@@ -9,7 +9,7 @@ body {
   font-family: Arial, sans-serif;
   background-color: #f0f0f0;
   height: 100dvh;
-  padding-top: 60px;
+  padding-top: 100px;
 }
 
 .header {
@@ -31,6 +31,9 @@ body {
   justify-content: flex-end;
   align-items: center;
   padding: 0 20px;
+  position: fixed;
+  top: 60px;
+  z-index: 1000;
 }
 
 .container-logo {
@@ -111,6 +114,43 @@ body {
 .stats p {
   margin: 3px 0;
 }
+
+/* ================= PAGINACIÓN ================= */
+
+.pagination {
+width: 100%;
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 20px;
+padding: 20px;
+}
+
+.pagination button {
+padding: 8px 16px;
+border: none;
+background-color: #ef5350;
+color: white;
+font-size: 0.9em;
+border-radius: 6px;
+cursor: pointer;
+transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+background-color: #d32f2f;
+transform: scale(1.05);
+}
+
+.pagination button:active {
+transform: scale(0.95);
+}
+
+.pagination span {
+font-weight: bold;
+font-size: 1.2em;
+}
+
 
 /* Tablets */
 @media (max-width: 900px) {
