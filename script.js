@@ -37,7 +37,7 @@ function createCard(pokemon) {
       title="${pokemon.name}">
     </div>
 
-    <p class="pokemon-name">${pokemon.name}</p>
+    <p id="pokemon-name">${pokemon.name}</p>
 
     <div class="stats">
       <p class="pokemon-weight">Peso: ${pokemon.weight}hg</p>

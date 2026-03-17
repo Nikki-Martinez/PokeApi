@@ -7,12 +7,21 @@
     <title>PokeApi</title>
   </head>
   <body>
-    <header class="header">Encabezado</header>
-    <select id="page-size">
-      <option value="25">25</option>
-      <option value="50" selected>50</option>
-      <option value="100">100</option>
-    </select>
+    <header class="header">
+      <div class="container-logo">
+        <img
+          src="./assets/favicon.png"
+          alt="PokeApi Logo"
+        />
+      </div>
+    </header>
+    <div class="bar">
+      <select id="page-size">
+        <option value="25">25</option>
+        <option value="50" selected>50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
     <div class="container-cards"></div>
     <script src="./script.js"></script>
   </body>
