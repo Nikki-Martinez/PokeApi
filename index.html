@@ -7,23 +7,64 @@
     <title>PokeApi</title>
   </head>
   <body>
-    <header class="header">
-      <div class="container-logo">
-        <img src="./assets/favicon.png" alt="PokeApi Logo" />
+    <div class="container">
+      <header>
+        <div class="logo">POKÉDEX</div>
+        <p style="color: white; font-size: 1.1rem;">
+          Explora el mundo Pokémon con filtros avanzados
+        </p>
+      </header>
+
+      <div class="controls-container">
+        <div class="search-container">
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="🔍 Buscar Pokémon por nombre o número..."
+          />
+          <button class="btn" id="searchButton">Buscar</button>
+          <button class="btn" id="randomButton">🎲 Aleatorio</button>
+          <button class="btn" id="clearFilters">🔄 Limpiar</button>
+        </div>
+
+        <div class="filter-container">
+          <div class="filter-group">
+            <label for="typeFilter">🏷️ Tipo:</label>
+            <select id="typeFilter">
+              <option value="">Todos los tipos</option>
+            </select>
+          </div>
+
+          <div class="filter-group pagination-controls">
+            <label for="itemsPerPage">📄 Por página:</label>
+            <select id="itemsPerPage">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </div>
       </div>
-    </header>
-    <div class="bar">
-      <select id="page-size">
-        <option value="25">25</option>
-        <option value="50" selected>50</option>
-        <option value="100">100</option>
-      </select>
+
+      <div id="pokemonGrid" class="pokedex-grid"></div>
+
+      <div class="pagination">
+        <button id="prevButton">⬅ Anterior</button>
+        <span class="page-info" id="pageInfo">Página 1 de 1</span>
+        <button id="nextButton">Siguiente ➡</button>
+      </div>
+
+      <div id="loading" class="loading" style="display: none;">
+        ⚡ Cargando Pokémon...
+      </div>
+      <div id="errorMessage" class="error-message" style="display: none;"></div>
     </div>
-    <div class="container-cards"></div>
-    <div class="pagination">
-      <button id="prev">⬅ Anterior</button> <span id="page-number">1</span>
-      <button id="next">Siguiente ➡</button>
-    </div>
+
+    <div id="overlay" class="overlay" style="display: none;"></div>
+    <div id="pokemonDetail" class="pokemon-detail" style="display: none;"></div>
+
     <script src="./script.js"></script>
   </body>
 </html>
