@@ -49,6 +49,16 @@ class AdvancedPokedex {
       this.prevButton.addEventListener('click', () => this.changePage(-1));
       this.nextButton.addEventListener('click', () => this.changePage(1));
       this.overlay.addEventListener('click', () => this.closeDetail());
+      
+      // Cerrar modal con tecla Escape
+      document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') this.closeDetail();
+      });
+      
+      // Manejar gestos touch en el modal
+      this.detailElement.addEventListener('touchmove', (e) => {
+          e.stopPropagation();
+      }, { passive: true });
   }
 
   async loadTypes() {
@@ -75,18 +85,18 @@ class AdvancedPokedex {
           normal: 'Normal',
           fire: 'Fuego',
           water: 'Agua',
-          electric: 'Eléctrico',
+          electric: 'Electrico',
           grass: 'Planta',
           ice: 'Hielo',
           fighting: 'Lucha',
           poison: 'Veneno',
           ground: 'Tierra',
           flying: 'Volador',
-          psychic: 'Psíquico',
+          psychic: 'Psiquico',
           bug: 'Bicho',
           rock: 'Roca',
           ghost: 'Fantasma',
-          dragon: 'Dragón',
+          dragon: 'Dragon',
           dark: 'Siniestro',
           steel: 'Acero',
           fairy: 'Hada'
@@ -102,7 +112,7 @@ class AdvancedPokedex {
           this.allPokemonBasic = data.results;
           this.filteredPokemon = [...this.allPokemonBasic];
       } catch (error) {
-          this.showError('Error al cargar la lista de Pokémon');
+          this.showError('Error al cargar la lista de Pokemon');
       } finally {
           this.showLoading(false);
       }
@@ -150,7 +160,7 @@ class AdvancedPokedex {
       this.grid.innerHTML = '';
       
       if (pagePokemon.length === 0) {
-          this.grid.innerHTML = '<div class="no-results">😕 No se encontraron Pokémon con estos filtros</div>';
+          this.grid.innerHTML = '<div class="no-results">No se encontraron Pokemon con estos filtros</div>';
           this.updatePagination();
           this.showLoading(false);
           return;
@@ -167,11 +177,17 @@ class AdvancedPokedex {
 
       this.updatePagination();
       this.showLoading(false);
+      
+      // Scroll al inicio en moviles
+      if (window.innerWidth <= 768) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
   }
 
   async fetchPokemonData(url) {
       try {
           const response = await fetch(url);
+          if (!response.ok) throw new Error('Error en la respuesta');
           return await response.json();
       } catch (error) {
           console.error('Error fetching pokemon:', error);
@@ -182,23 +198,33 @@ class AdvancedPokedex {
   createPokemonCard(pokemon) {
       const card = document.createElement('div');
       card.className = 'pokemon-card';
+      card.setAttribute('role', 'listitem');
       card.style.animationDelay = `${Math.random() * 0.3}s`;
       
       const primaryType = pokemon.types[0].type.name;
       card.style.background = `linear-gradient(135deg, white 60%, ${this.getTypeColor(primaryType)}20)`;
       
+      const spriteUrl = pokemon.sprites.other['official-artwork'].front_default || 
+                       pokemon.sprites.front_default || 
+                       'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23ddd" width="100" height="100"/></svg>';
+      
       card.innerHTML = `
           <div class="pokemon-id">#${String(pokemon.id).padStart(3, '0')}</div>
           <div class="pokemon-image" style="background: ${this.getTypeColor(primaryType)}15;">
-              <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" 
-                   alt="${pokemon.name}" loading="lazy">
+              <img src="${spriteUrl}" 
+                   alt="Imagen de ${pokemon.name}" 
+                   loading="lazy"
+                   onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23ddd%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22>Sin imagen</text></svg>'">
           </div>
           <div class="pokemon-name">${pokemon.name}</div>
           <div class="pokemon-types">
               ${pokemon.types.map(type => 
                   `<span class="type-badge type-${type.type.name}" 
                          onclick="event.stopPropagation(); app.quickFilterByType('${type.type.name}')"
-                         title="Filtrar por tipo ${this.translateType(type.type.name)}">
+                         title="Filtrar por tipo ${this.translateType(type.type.name)}"
+                         role="button"
+                         tabindex="0"
+                         aria-label="Filtrar por tipo ${this.translateType(type.type.name)}">
                       ${this.translateType(type.type.name)}
                   </span>`
               ).join('')}
@@ -206,6 +232,18 @@ class AdvancedPokedex {
       `;
 
       card.addEventListener('click', () => this.showPokemonDetail(pokemon));
+      
+      // Soporte para teclado
+      card.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              this.showPokemonDetail(pokemon);
+          }
+      });
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', `Ver detalles de ${pokemon.name}`);
+      
       return card;
   }
 
@@ -241,7 +279,7 @@ class AdvancedPokedex {
 
   showPokemonDetail(pokemon) {
       const stats = pokemon.stats.map(stat => {
-          const percentage = (stat.base_stat / 255) * 100;
+          const percentage = Math.min((stat.base_stat / 255) * 100, 100);
           return `
               <div class="stat-bar">
                   <div class="stat-name">
@@ -255,12 +293,18 @@ class AdvancedPokedex {
           `;
       }).join('');
 
+      const spriteUrl = pokemon.sprites.other['official-artwork'].front_default || 
+                       pokemon.sprites.front_default || 
+                       'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><rect fill="%23ddd" width="180" height="180"/></svg>';
+
       const detailHTML = `
-          <button class="close-button" onclick="app.closeDetail()">✕</button>
+          <button class="close-button" onclick="app.closeDetail()" aria-label="Cerrar detalles">X</button>
           <div class="pokemon-id" style="font-size: 1.2rem;">#${String(pokemon.id).padStart(3, '0')}</div>
           <div class="pokemon-image" style="width: 200px; height: 200px; margin: 20px auto; background: ${this.getTypeColor(pokemon.types[0].type.name)}15;">
-              <img src="${pokemon.sprites.other['official-artwork'].front_default || pokemon.sprites.front_default}" 
-                   style="width: 180px; height: 180px;">
+              <img src="${spriteUrl}" 
+                   style="width: 180px; height: 180px;" 
+                   alt="Imagen de ${pokemon.name}"
+                   onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22><rect fill=%22%23ddd%22 width=%22180%22 height=%22180%22/><text x=%2290%22 y=%2290%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22>Sin imagen</text></svg>'">
           </div>
           <div class="pokemon-name" style="font-size: 1.8rem;">${pokemon.name}</div>
           <div class="pokemon-types" style="margin-top: 10px;">
@@ -271,15 +315,15 @@ class AdvancedPokedex {
 
           <div class="info-grid">
               <div class="info-item">
-                  <div class="info-label">📏 Altura</div>
+                  <div class="info-label">Altura</div>
                   <div class="info-value">${pokemon.height / 10} m</div>
               </div>
               <div class="info-item">
-                  <div class="info-label">⚖️ Peso</div>
+                  <div class="info-label">Peso</div>
                   <div class="info-value">${pokemon.weight / 10} kg</div>
               </div>
               <div class="info-item">
-                  <div class="info-label">💪 Habilidades</div>
+                  <div class="info-label">Habilidades</div>
                   <div class="info-value" style="font-size: 0.9rem;">
                       ${pokemon.abilities.map(a => 
                           `<span style="display: block; text-transform: capitalize;">${a.ability.name.replace('-', ' ')}</span>`
@@ -289,7 +333,7 @@ class AdvancedPokedex {
           </div>
 
           <div class="stats-container">
-              <h3 style="margin-bottom: 15px; color: #333;">📊 Estadísticas Base</h3>
+              <h3 style="margin-bottom: 15px; color: #333;">Estadisticas Base</h3>
               ${stats}
               <div style="text-align: center; margin-top: 15px; font-weight: bold; font-size: 1.2rem; color: #333;">
                   Total: ${pokemon.stats.reduce((sum, stat) => sum + stat.base_stat, 0)}
@@ -297,10 +341,16 @@ class AdvancedPokedex {
           </div>
       `;
 
-      this.detailElement.innerHTML = detailHTML;
+      this.detailElement.querySelector('.detail-content').innerHTML = detailHTML;
       this.detailElement.style.display = 'block';
       this.overlay.style.display = 'block';
       document.body.style.overflow = 'hidden';
+      
+      // Scroll al inicio del modal
+      this.detailElement.scrollTop = 0;
+      
+      // Enfocar el modal para accesibilidad
+      this.detailElement.focus();
   }
 
   translateStat(statName) {
@@ -339,7 +389,7 @@ class AdvancedPokedex {
       this.showLoading(true);
       try {
           const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${searchTerm}`);
-          if (!response.ok) throw new Error('Pokémon no encontrado');
+          if (!response.ok) throw new Error('Pokemon no encontrado');
           
           const pokemon = await response.json();
           this.grid.innerHTML = '';
@@ -347,9 +397,13 @@ class AdvancedPokedex {
           
           this.prevButton.disabled = true;
           this.nextButton.disabled = true;
-          this.pageInfo.textContent = 'Resultado de búsqueda';
+          this.pageInfo.textContent = 'Resultado de busqueda';
+          
+          // Limpiar filtros visuales
+          this.typeFilter.value = '';
+          this.selectedType = '';
       } catch (error) {
-          this.showError('Pokémon no encontrado. Intenta con otro nombre o número.');
+          this.showError('Pokemon no encontrado. Intenta con otro nombre o numero.');
           await this.clearAllFilters();
       } finally {
           this.showLoading(false);
@@ -361,15 +415,21 @@ class AdvancedPokedex {
       this.showLoading(true);
       try {
           const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${randomId}`);
+          if (!response.ok) throw new Error('Error al cargar');
+          
           const pokemon = await response.json();
           this.grid.innerHTML = '';
           this.grid.appendChild(this.createPokemonCard(pokemon));
           
           this.prevButton.disabled = true;
           this.nextButton.disabled = true;
-          this.pageInfo.textContent = '✨ Pokémon Aleatorio';
+          this.pageInfo.textContent = 'Pokemon Aleatorio';
+          
+          // Limpiar filtros visuales
+          this.typeFilter.value = '';
+          this.selectedType = '';
       } catch (error) {
-          this.showError('Error al cargar Pokémon aleatorio');
+          this.showError('Error al cargar Pokemon aleatorio');
       } finally {
           this.showLoading(false);
       }
@@ -392,7 +452,10 @@ class AdvancedPokedex {
       if (newPage >= 1 && newPage <= totalPages) {
           this.currentPage = newPage;
           this.renderCurrentPage();
-          this.grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          
+          // Scroll suave al grid
+          const gridTop = this.grid.getBoundingClientRect().top + window.pageYOffset - 20;
+          window.scrollTo({ top: gridTop, behavior: 'smooth' });
       }
   }
 
@@ -401,7 +464,7 @@ class AdvancedPokedex {
       this.prevButton.disabled = this.currentPage === 1;
       this.nextButton.disabled = this.currentPage >= totalPages || totalPages === 0;
       this.pageInfo.textContent = totalPages > 0 
-          ? `Página ${this.currentPage} de ${totalPages} (${this.filteredPokemon.length} Pokémon)`
+          ? `Pagina ${this.currentPage} de ${totalPages} (${this.filteredPokemon.length} Pokemon)`
           : 'Sin resultados';
   }
 
@@ -419,5 +482,16 @@ class AdvancedPokedex {
   }
 }
 
-// Inicializar la aplicación
-const app = new AdvancedPokedex();
+// Inicializar la aplicacion cuando el DOM este listo
+document.addEventListener('DOMContentLoaded', () => {
+  window.app = new AdvancedPokedex();
+});
+
+// Manejar cambios de orientacion en dispositivos moviles
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+      if (window.app && window.app.grid) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+  }, 100);
+});

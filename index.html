@@ -1,70 +1,73 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" />
-    <title>PokeApi</title>
-  </head>
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Pokedex interactiva con filtros por tipo y paginacion configurable">
+    <title>Pokedex Avanzada - PokeAPI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
     <div class="container">
-      <header>
-        <div class="logo">POKÉDEX</div>
-        <p style="color: white; font-size: 1.1rem;">
-          Explora el mundo Pokémon con filtros avanzados
-        </p>
-      </header>
+        <header>
+            <h1 class="logo">POKEDEX</h1>
+            <p class="subtitle">Explora el mundo Pokemon con filtros avanzados</p>
+        </header>
 
-      <div class="controls-container">
-        <div class="search-container">
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="🔍 Buscar Pokémon por nombre o número..."
-          />
-          <button class="btn" id="searchButton">Buscar</button>
-          <button class="btn" id="randomButton">🎲 Aleatorio</button>
-          <button class="btn" id="clearFilters">🔄 Limpiar</button>
+        <div class="controls-container">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Buscar Pokemon por nombre o numero..." aria-label="Buscar Pokemon">
+                <button class="btn" id="searchButton" aria-label="Buscar">Buscar</button>
+                <button class="btn" id="randomButton" aria-label="Pokemon aleatorio">Aleatorio</button>
+                <button class="btn" id="clearFilters" aria-label="Limpiar filtros">Limpiar</button>
+            </div>
+
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="typeFilter">Tipo:</label>
+                    <select id="typeFilter" aria-label="Filtrar por tipo">
+                        <option value="">Todos los tipos</option>
+                    </select>
+                </div>
+
+                <div class="filter-group pagination-controls">
+                    <label for="itemsPerPage">Por pagina:</label>
+                    <select id="itemsPerPage" aria-label="Pokemon por pagina">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
-        <div class="filter-container">
-          <div class="filter-group">
-            <label for="typeFilter">🏷️ Tipo:</label>
-            <select id="typeFilter">
-              <option value="">Todos los tipos</option>
-            </select>
-          </div>
+        <main>
+            <div id="pokemonGrid" class="pokedex-grid" role="list" aria-label="Lista de Pokemon"></div>
+            
+            <nav class="pagination" aria-label="Navegacion de paginas">
+                <button id="prevButton" aria-label="Pagina anterior">Anterior</button>
+                <span class="page-info" id="pageInfo" aria-live="polite">Pagina 1 de 1</span>
+                <button id="nextButton" aria-label="Pagina siguiente">Siguiente</button>
+            </nav>
 
-          <div class="filter-group pagination-controls">
-            <label for="itemsPerPage">📄 Por página:</label>
-            <select id="itemsPerPage">
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="25" selected>25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div id="pokemonGrid" class="pokedex-grid"></div>
-
-      <div class="pagination">
-        <button id="prevButton">⬅ Anterior</button>
-        <span class="page-info" id="pageInfo">Página 1 de 1</span>
-        <button id="nextButton">Siguiente ➡</button>
-      </div>
-
-      <div id="loading" class="loading" style="display: none;">
-        ⚡ Cargando Pokémon...
-      </div>
-      <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="loading" class="loading" style="display: none;" role="status" aria-label="Cargando">
+                <div class="loading-spinner"></div>
+                <p>Cargando Pokemon...</p>
+            </div>
+            
+            <div id="errorMessage" class="error-message" style="display: none;" role="alert"></div>
+        </main>
     </div>
 
-    <div id="overlay" class="overlay" style="display: none;"></div>
-    <div id="pokemonDetail" class="pokemon-detail" style="display: none;"></div>
+    <div id="overlay" class="overlay" style="display: none;" aria-hidden="true"></div>
+    
+    <aside id="pokemonDetail" class="pokemon-detail" style="display: none;" role="dialog" aria-modal="true" aria-label="Detalles del Pokemon">
+        <div class="detail-content"></div>
+    </aside>
 
     <script src="./script.js"></script>
-  </body>
+</body>
 </html>
