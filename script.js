@@ -7,7 +7,7 @@ class AdvancedPokedex {
       this.allPokemonBasic = [];
       this.typeList = [];
       this.isFiltering = false;
-      
+        
       this.initializeElements();
       this.attachEventListeners();
       this.initializeApp();
